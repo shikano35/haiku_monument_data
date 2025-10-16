@@ -14,7 +14,10 @@ export function negotiateFormat(acceptHeader?: string): RDFFormat {
     return DEFAULT_RDF_FORMAT;
   }
 
-  // Acceptヘッダーをパースして優先度順に並べる
+  if (acceptHeader.includes("text/html") || acceptHeader.includes("*/*")) {
+    return DEFAULT_RDF_FORMAT;
+  }
+
   const accepts = acceptHeader
     .split(",")
     .map((type) => {
@@ -25,7 +28,6 @@ export function negotiateFormat(acceptHeader?: string): RDFFormat {
     })
     .sort((a, b) => b.q - a.q);
 
-  // 優先度順にマッチするフォーマットを探す
   for (const { mimeType } of accepts) {
     const format = MIME_TO_FORMAT[mimeType];
     if (format) {
