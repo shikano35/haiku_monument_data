@@ -54,10 +54,7 @@ export async function cors(c: Context<{ Bindings: Env }>, next: Next) {
   await next();
 
   c.res.headers.set("Access-Control-Allow-Origin", "*");
-  c.res.headers.set(
-    "Access-Control-Allow-Methods",
-    "GET, OPTIONS",
-  );
+  c.res.headers.set("Access-Control-Allow-Methods", "GET, OPTIONS");
   c.res.headers.set(
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, Accept",
