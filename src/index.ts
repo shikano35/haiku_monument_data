@@ -1,7 +1,17 @@
+import { cors, errorHandler, logger } from "@/interfaces/middlewares";
+import locationsRoutes from "@/interfaces/routes/locationsRoutes";
+import monumentsRoutes from "@/interfaces/routes/monumentsRoutes";
+import poemsRoutes from "@/interfaces/routes/poemsRoutes";
+import poetsRoutes from "@/interfaces/routes/poetsRoutes";
+import voidRoutes from "@/interfaces/routes/voidRoutes";
 import type { Env } from "@/types";
 import { Hono } from "hono";
 
 const app = new Hono<{ Bindings: Env }>();
+
+app.use("*", logger);
+app.use("*", cors);
+app.use("*", errorHandler);
 
 /**
  * ルートエンドポイント
@@ -18,26 +28,18 @@ app.get("/", (c) => {
       locations: "/locations",
       void: "/void",
     },
-    formats: [
-      "text/turtle",
-      "application/n-triples",
-      "application/ld+json",
-      "application/rdf+xml",
-    ],
+    formats: {
+      available: ["text/turtle", "application/n-triples"],
+      planned: ["application/ld+json", "application/rdf+xml"],
+    },
     documentation: "https://github.com/shikano35/haiku_monument_data",
   });
 });
 
-/**
- * TODO: RDFリソースの公開エンドポイントを実装
- * - GET /monuments - すべての句碑のRDF
- * - GET /monuments/:id - 特定の句碑のRDF
- * - GET /poems - すべての俳句のRDF
- * - GET /poems/:id - 特定の俳句のRDF
- * - GET /poets - すべての俳人のRDF
- * - GET /poets/:id - 特定の俳人のRDF
- * - GET /locations/:id - 特定の場所のRDF
- * - GET /void - VoIDディスクリプタ
- */
+app.route("/monuments", monumentsRoutes);
+app.route("/poems", poemsRoutes);
+app.route("/poets", poetsRoutes);
+app.route("/locations", locationsRoutes);
+app.route("/void", voidRoutes);
 
 export default app;

@@ -6,6 +6,6 @@
   "compatibility_flags": ["nodejs_compat"],
 
   "vars": {
-    "HAIKU_MONUMENT_API_URL": "https://rdf.kuhi.jp"
+    "HAIKU_MONUMENT_API_URL": "https://api.kuhi.jp"
   }
 }
