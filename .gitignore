@@ -37,3 +37,10 @@ coverage/
 
 # instructions
 .github/instructions
+
+# environment variables
+.dev.vars.example
+.dev.vars
+
+# logs
+CHANGELOG.md
