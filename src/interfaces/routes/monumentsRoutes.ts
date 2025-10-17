@@ -3,6 +3,8 @@ import {
   convertMonumentsToRDF,
   convertEventToRDF,
   convertMediaToRDF,
+  convertInscriptionToRDF,
+  inscriptionApiToRDF,
 } from "@/domain/converters";
 import { HaikuMonumentApiClient } from "@/infrastructure/api/HaikuMonumentApiClient";
 import { serializeRDF } from "@/infrastructure/rdf/serializer";
@@ -67,8 +69,20 @@ monumentsRoutes.get("/:id", async (c) => {
     const monument = await client.getMonument(id, "all");
     const quads = convertMonumentToRDF(monument);
     
-    // Eventsデータも追加でRDF化
+    // Store を作成
     const store = new Store(quads);
+    
+    // Inscriptionsデータを埋め込み形式でRDF化
+    if (monument.inscriptions && monument.inscriptions.length > 0) {
+      for (const inscription of monument.inscriptions) {
+        convertInscriptionToRDF(
+          inscriptionApiToRDF(inscription, monument.id),
+          store
+        );
+      }
+    }
+    
+    // Eventsデータも追加でRDF化
     if (monument.events && monument.events.length > 0) {
       for (const event of monument.events) {
         convertEventToRDF(
