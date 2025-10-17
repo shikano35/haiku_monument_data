@@ -8,3 +8,5 @@ export {
   convertLocationToRDF,
   convertLocationsToRDF,
 } from "./LocationConverter";
+export { convertEventToRDF } from "./EventConverter";
+export { convertMediaToRDF } from "./MediaConverter";
