@@ -6,6 +6,7 @@ import {
 import type { MonumentDetail } from "@/types/api";
 import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
+import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 
 const { namedNode, literal, quad } = DataFactory;
 
@@ -22,7 +23,7 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
     quad(
       subject,
       namedNode(VOCABULARIES.RDF.type),
-      namedNode(VOCABULARIES.SCHEMA.Monument),
+      namedNode(VOCABULARIES.SCHEMA.LandmarksOrHistoricalBuildings),
     ),
   );
   quads.push(
@@ -70,6 +71,17 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
         namedNode(monument.monument_type_uri),
       ),
     );
+    
+    // Getty AAT URIの場合は、明示的にAAT語彙として参照
+    if (monument.monument_type_uri.startsWith("http://vocab.getty.edu/aat/")) {
+      quads.push(
+        quad(
+          subject,
+          namedNode(VOCABULARIES.SCHEMA.additionalType),
+          namedNode(monument.monument_type_uri),
+        ),
+      );
+    }
   }
 
   if (monument.material) {
@@ -90,24 +102,41 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
         namedNode(monument.material_uri),
       ),
     );
+    
+    // Getty AAT URIの場合は、明示的にAAT語彙として参照
+    if (monument.material_uri.startsWith("http://vocab.getty.edu/aat/")) {
+      quads.push(
+        quad(
+          subject,
+          namedNode(VOCABULARIES.SCHEMA.material),
+          namedNode(monument.material_uri),
+        ),
+      );
+    }
   }
 
-  // Temporal properties
-  quads.push(
-    quad(
-      subject,
-      namedNode(VOCABULARIES.DC.created),
-      literal(monument.created_at, namedNode(VOCABULARIES.XSD.dateTime)),
-    ),
-  );
+  // Temporal properties (ISO 8601 format with timezone)
+  const createdAt = formatToISO8601(monument.created_at);
+  if (createdAt) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.DC.created),
+        literal(createdAt, namedNode(VOCABULARIES.XSD.dateTime)),
+      ),
+    );
+  }
 
-  quads.push(
-    quad(
-      subject,
-      namedNode(VOCABULARIES.DC.modified),
-      literal(monument.updated_at, namedNode(VOCABULARIES.XSD.dateTime)),
-    ),
-  );
+  const updatedAt = formatToISO8601(monument.updated_at);
+  if (updatedAt) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.DC.modified),
+        literal(updatedAt, namedNode(VOCABULARIES.XSD.dateTime)),
+      ),
+    );
+  }
 
   if (monument.hu_time_normalized) {
     quads.push(
@@ -177,6 +206,45 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
           quad(
             subject,
             namedNode(VOCABULARIES.GEO.long),
+            literal(
+              location.longitude.toString(),
+              namedNode(VOCABULARIES.XSD.decimal),
+            ),
+          ),
+        );
+
+        // schema:GeoCoordinates パターン
+        const geoNodeId = `_:geo_${monument.id}`;
+        const geoNode = namedNode(geoNodeId);
+        
+        quads.push(
+          quad(
+            subject,
+            namedNode(VOCABULARIES.SCHEMA.geo),
+            geoNode,
+          ),
+        );
+        quads.push(
+          quad(
+            geoNode,
+            namedNode(VOCABULARIES.RDF.type),
+            namedNode(VOCABULARIES.SCHEMA.GeoCoordinates),
+          ),
+        );
+        quads.push(
+          quad(
+            geoNode,
+            namedNode(VOCABULARIES.SCHEMA.latitude),
+            literal(
+              location.latitude.toString(),
+              namedNode(VOCABULARIES.XSD.decimal),
+            ),
+          ),
+        );
+        quads.push(
+          quad(
+            geoNode,
+            namedNode(VOCABULARIES.SCHEMA.longitude),
             literal(
               location.longitude.toString(),
               namedNode(VOCABULARIES.XSD.decimal),
