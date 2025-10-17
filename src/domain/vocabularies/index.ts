@@ -11,13 +11,18 @@ export const VOCABULARIES = {
   SCHEMA: {
     BASE: "http://schema.org/",
     Monument: "http://schema.org/Monument",
+    LandmarksOrHistoricalBuildings: "http://schema.org/LandmarksOrHistoricalBuildings",
     Place: "http://schema.org/Place",
     Person: "http://schema.org/Person",
     CreativeWork: "http://schema.org/CreativeWork",
+    ImageObject: "http://schema.org/ImageObject",
+    GeoCoordinates: "http://schema.org/GeoCoordinates",
     name: "http://schema.org/name",
     url: "http://schema.org/url",
+    contentUrl: "http://schema.org/contentUrl",
     author: "http://schema.org/author",
     location: "http://schema.org/location",
+    geo: "http://schema.org/geo",
     image: "http://schema.org/image",
     material: "http://schema.org/material",
     text: "http://schema.org/text",
@@ -28,6 +33,8 @@ export const VOCABULARIES = {
     latitude: "http://schema.org/latitude",
     longitude: "http://schema.org/longitude",
     address: "http://schema.org/address",
+    additionalType: "http://schema.org/additionalType",
+    associatedMedia: "http://schema.org/associatedMedia",
   },
 
   // Dublin Core Terms - 文書メタデータ
@@ -83,6 +90,40 @@ export const VOCABULARIES = {
     dateTime: "http://www.w3.org/2001/XMLSchema#dateTime",
     date: "http://www.w3.org/2001/XMLSchema#date",
     boolean: "http://www.w3.org/2001/XMLSchema#boolean",
+  },
+
+  // HuTime - 時間情報の標準化
+  HUTIME: {
+    BASE: "http://www.hutime.org/ontology/",
+    huTimeNormalized: "http://www.hutime.org/ontology/huTimeNormalized",
+    intervalStart: "http://www.hutime.org/ontology/intervalStart",
+    intervalEnd: "http://www.hutime.org/ontology/intervalEnd",
+    uncertaintyNote: "http://www.hutime.org/ontology/uncertaintyNote",
+  },
+
+  // IMI - 共通語彙基盤
+  IMI: {
+    BASE: "http://imi.go.jp/ns/core/rdf#",
+    Prefecture: "http://imi.go.jp/ns/core/rdf#Prefecture",
+    City: "http://imi.go.jp/ns/core/rdf#City",
+    prefectureCode: "http://imi.go.jp/ns/core/rdf#prefectureCode",
+    cityCode: "http://imi.go.jp/ns/core/rdf#cityCode",
+  },
+
+  // IIIF - International Image Interoperability Framework
+  IIIF: {
+    BASE: "http://iiif.io/api/presentation/3#",
+    Manifest: "http://iiif.io/api/presentation/3#Manifest",
+    Canvas: "http://iiif.io/api/presentation/3#Canvas",
+  },
+
+  // Getty AAT - Art & Architecture Thesaurus
+  AAT: {
+    BASE: "http://vocab.getty.edu/aat/",
+    monument: "http://vocab.getty.edu/aat/300006958", // 記念碑
+    stone: "http://vocab.getty.edu/aat/300011443", // 石
+    granite: "http://vocab.getty.edu/aat/300011443", // 花崗岩
+    marble: "http://vocab.getty.edu/aat/300011443", // 大理石
   },
 } as const;
 
@@ -175,5 +216,9 @@ export const TURTLE_PREFIXES = `
 @prefix rdfs: <${VOCABULARIES.RDFS.BASE}> .
 @prefix owl: <${VOCABULARIES.OWL.BASE}> .
 @prefix xsd: <${VOCABULARIES.XSD.BASE}> .
+@prefix hutime: <${VOCABULARIES.HUTIME.BASE}> .
+@prefix imi: <${VOCABULARIES.IMI.BASE}> .
+@prefix iiif: <${VOCABULARIES.IIIF.BASE}> .
+@prefix aat: <${VOCABULARIES.AAT.BASE}> .
 @prefix hm: <${HAIKU_MONUMENT_VOCAB.BASE}> .
 `.trim();
