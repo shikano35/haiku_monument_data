@@ -6,6 +6,7 @@ import {
 import type { Location, LocationDetail } from "@/types/api";
 import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
+import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 
 const { namedNode, literal, quad } = DataFactory;
 
@@ -50,8 +51,18 @@ export function convertLocationToRDF(
     quads.push(
       quad(
         subject,
-        namedNode(HAIKU_MONUMENT_VOCAB.imiPrefCode),
+        namedNode(VOCABULARIES.IMI.prefectureCode),
         literal(location.imi_pref_code),
+      ),
+    );
+    
+    // IMI Prefecture URIへのリンク（例: 三重県 = 24）
+    // 参考: http://imi.go.jp/ns/core/rdf#Prefecture/{code}
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.RDF.type),
+        namedNode(`${VOCABULARIES.IMI.Prefecture}/${location.imi_pref_code}`),
       ),
     );
   }
@@ -166,25 +177,31 @@ export function convertLocationToRDF(
     );
   }
 
-  // Temporal properties (if available)
+  // Temporal properties (ISO 8601 format with timezone)
   if (location.created_at) {
-    quads.push(
-      quad(
-        subject,
-        namedNode(VOCABULARIES.DC.created),
-        literal(location.created_at, namedNode(VOCABULARIES.XSD.dateTime)),
-      ),
-    );
+    const createdAt = formatToISO8601(location.created_at);
+    if (createdAt) {
+      quads.push(
+        quad(
+          subject,
+          namedNode(VOCABULARIES.DC.created),
+          literal(createdAt, namedNode(VOCABULARIES.XSD.dateTime)),
+        ),
+      );
+    }
   }
 
   if (location.updated_at) {
-    quads.push(
-      quad(
-        subject,
-        namedNode(VOCABULARIES.DC.modified),
-        literal(location.updated_at, namedNode(VOCABULARIES.XSD.dateTime)),
-      ),
-    );
+    const updatedAt = formatToISO8601(location.updated_at);
+    if (updatedAt) {
+      quads.push(
+        quad(
+          subject,
+          namedNode(VOCABULARIES.DC.modified),
+          literal(updatedAt, namedNode(VOCABULARIES.XSD.dateTime)),
+        ),
+      );
+    }
   }
 
   // LocationDetail specific properties

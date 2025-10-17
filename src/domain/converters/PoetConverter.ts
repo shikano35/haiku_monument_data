@@ -6,6 +6,7 @@ import {
 import type { Poet, PoetDetail } from "@/types/api";
 import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
+import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 
 const { namedNode, literal, quad } = DataFactory;
 
@@ -133,22 +134,28 @@ export function convertPoetToRDF(poet: Poet | PoetDetail): Quad[] {
     );
   }
 
-  // Temporal properties
-  quads.push(
-    quad(
-      subject,
-      namedNode(VOCABULARIES.DC.created),
-      literal(poet.created_at, namedNode(VOCABULARIES.XSD.dateTime)),
-    ),
-  );
+  // Temporal properties (ISO 8601 format with timezone)
+  const createdAt = formatToISO8601(poet.created_at);
+  if (createdAt) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.DC.created),
+        literal(createdAt, namedNode(VOCABULARIES.XSD.dateTime)),
+      ),
+    );
+  }
 
-  quads.push(
-    quad(
-      subject,
-      namedNode(VOCABULARIES.DC.modified),
-      literal(poet.updated_at, namedNode(VOCABULARIES.XSD.dateTime)),
-    ),
-  );
+  const updatedAt = formatToISO8601(poet.updated_at);
+  if (updatedAt) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.DC.modified),
+        literal(updatedAt, namedNode(VOCABULARIES.XSD.dateTime)),
+      ),
+    );
+  }
 
   // PoetDetail specific properties
   if ("monuments" in poet && poet.monuments) {

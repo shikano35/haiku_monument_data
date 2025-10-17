@@ -1,10 +1,30 @@
 import type { RDFFormat } from "@/types";
 import type { Quad } from "@rdfjs/types";
+import { VOCABULARIES, HAIKU_MONUMENT_VOCAB } from "@/domain/vocabularies";
 /**
  * RDFシリアライザー
  * N3.jsを使用してRDFデータを各種フォーマットに変換
  */
 import { Writer } from "n3";
+
+/**
+ * デフォルトのプレフィックス定義
+ */
+const DEFAULT_PREFIXES = {
+  schema: VOCABULARIES.SCHEMA.BASE,
+  dc: VOCABULARIES.DC.BASE,
+  foaf: VOCABULARIES.FOAF.BASE,
+  geo: VOCABULARIES.GEO.BASE,
+  rdf: VOCABULARIES.RDF.BASE,
+  rdfs: VOCABULARIES.RDFS.BASE,
+  owl: VOCABULARIES.OWL.BASE,
+  xsd: VOCABULARIES.XSD.BASE,
+  hutime: VOCABULARIES.HUTIME.BASE,
+  imi: VOCABULARIES.IMI.BASE,
+  iiif: VOCABULARIES.IIIF.BASE,
+  aat: VOCABULARIES.AAT.BASE,
+  hm: HAIKU_MONUMENT_VOCAB.BASE,
+};
 
 /**
  * RDFトリプルを指定されたフォーマットでシリアライズ
@@ -18,7 +38,10 @@ export async function serializeRDF(
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const writerFormat = mapFormatToN3Format(format);
-    const writer = new Writer({ format: writerFormat });
+    const writer = new Writer({ 
+      format: writerFormat,
+      prefixes: DEFAULT_PREFIXES,
+    });
 
     // クワッドを追加
     for (const quad of quads) {
