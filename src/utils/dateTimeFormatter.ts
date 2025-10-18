@@ -18,7 +18,7 @@ export function formatToISO8601(dateString: string | null | undefined): string |
 
     // スペース区切り（MySQL datetime形式）の場合
     // "2025-05-11 16:02:33" -> "2025-05-11T16:02:33.000Z"
-    const spaceSeparated = dateString.replace(' ', 'T');
+    const spaceSeparated = dateString.replace(' ', 'T') + 'Z';
     const date = new Date(spaceSeparated);
     
     if (Number.isNaN(date.getTime())) return null;
