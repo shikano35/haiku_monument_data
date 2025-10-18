@@ -1,5 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { negotiateFormat, getContentType } from "@/utils/contentNegotiation";
+import {
+  getContentType,
+  getFileExtension,
+  negotiateFormat,
+} from "@/utils/contentNegotiation";
+import { describe, expect, it } from "vitest";
 
 describe("Content Negotiation", () => {
   describe("negotiateFormat", () => {
@@ -48,6 +52,29 @@ describe("Content Negotiation", () => {
     it("should return correct content type for application/n-triples", () => {
       const contentType = getContentType("application/n-triples");
       expect(contentType).toBe("application/n-triples");
+    });
+  });
+
+  describe("getFileExtension", () => {
+    it("should return .ttl for Turtle format", () => {
+      expect(getFileExtension("text/turtle")).toBe(".ttl");
+    });
+
+    it("should return .nt for N-Triples format", () => {
+      expect(getFileExtension("application/n-triples")).toBe(".nt");
+    });
+
+    it("should return .jsonld for JSON-LD format", () => {
+      expect(getFileExtension("application/ld+json")).toBe(".jsonld");
+    });
+
+    it("should return .rdf for RDF/XML format", () => {
+      expect(getFileExtension("application/rdf+xml")).toBe(".rdf");
+    });
+
+    it("should return .ttl for unknown format (default)", () => {
+      // @ts-expect-error Testing unknown format handling
+      expect(getFileExtension("unknown/format")).toBe(".ttl");
     });
   });
 });
