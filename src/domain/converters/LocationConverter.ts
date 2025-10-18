@@ -56,13 +56,12 @@ export function convertLocationToRDF(
       ),
     );
     
-    // IMI Prefecture URIへのリンク（例: 三重県 = 24）
-    // 参考: http://imi.go.jp/ns/core/rdf#Prefecture/{code}
+    // IMI Prefecture URIへのリンク
     quads.push(
       quad(
         subject,
         namedNode(VOCABULARIES.RDF.type),
-        namedNode(`${VOCABULARIES.IMI.Prefecture}/${location.imi_pref_code}`),
+        namedNode(`${VOCABULARIES.IMI.PrefectureBase}${location.imi_pref_code}`),
       ),
     );
   }

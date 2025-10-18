@@ -104,7 +104,7 @@ export const VOCABULARIES = {
   // IMI - 共通語彙基盤
   IMI: {
     BASE: "http://imi.go.jp/ns/core/rdf#",
-    Prefecture: "http://imi.go.jp/ns/core/rdf#Prefecture",
+    PrefectureBase: "http://imi.go.jp/ns/core/rdf#Prefecture",
     City: "http://imi.go.jp/ns/core/rdf#City",
     prefectureCode: "http://imi.go.jp/ns/core/rdf#prefectureCode",
     cityCode: "http://imi.go.jp/ns/core/rdf#cityCode",
@@ -121,7 +121,7 @@ export const VOCABULARIES = {
   AAT: {
     BASE: "http://vocab.getty.edu/aat/",
     monument: "http://vocab.getty.edu/aat/300006958", // 記念碑
-    stone: "http://vocab.getty.edu/aat/300011443", // 石
+    stone: "http://vocab.getty.edu/aat/300011176", // 石
     granite: "http://vocab.getty.edu/aat/300011443", // 花崗岩
     marble: "http://vocab.getty.edu/aat/300011443", // 大理石
   },
@@ -168,6 +168,8 @@ export const HAIKU_MONUMENT_VOCAB = {
   // プロパティ - Poet関連
   nameKana: "https://rdf.kuhi.jp/vocab#nameKana",
   biography: "https://rdf.kuhi.jp/vocab#biography",
+  birthYear: "https://rdf.kuhi.jp/vocab#birthYear",
+  deathYear: "https://rdf.kuhi.jp/vocab#deathYear",
 
   // プロパティ - Location関連
   imiPrefCode: "https://rdf.kuhi.jp/vocab#imiPrefCode",
