@@ -3,99 +3,126 @@
  * HuTime時間情報の標準化表現を含む
  */
 
-import type { Store } from "n3";
+import type { Event } from "@/types/api";
+import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import type { EventRDFEntity } from "../entities/RDFEntity";
 import {
   HAIKU_MONUMENT_VOCAB,
   RESOURCE_BASE,
   VOCABULARIES,
 } from "../vocabularies";
-import { formatToXSDDate } from "@/utils/dateTimeFormatter";
 
-const { namedNode, literal } = DataFactory;
+const { namedNode, literal, quad } = DataFactory;
 
 /**
- * イベントデータをRDFトリプルに変換
- * @param event - イベントデータ
- * @param store - RDFストア
+ * Event（イベント）データをRDF Triplesに変換
  */
-export function convertEventToRDF(event: EventRDFEntity, store: Store): void {
-  const eventUri = namedNode(`${RESOURCE_BASE.EVENTS}${event.id}`);
+export function convertEventToRDF(event: Event): Quad[] {
+  const quads: Quad[] = [];
+  const eventUri = `${RESOURCE_BASE.EVENTS}${event.id}`;
+  const subject = namedNode(eventUri);
 
-  // 基本的なクラス定義
-  store.addQuad(
-    eventUri,
-    namedNode(VOCABULARIES.RDF.type),
-    namedNode(HAIKU_MONUMENT_VOCAB.Event)
+  // Type declarations
+  quads.push(
+    quad(
+      subject,
+      namedNode(VOCABULARIES.RDF.type),
+      namedNode(VOCABULARIES.SCHEMA.Event),
+    ),
+  );
+  quads.push(
+    quad(
+      subject,
+      namedNode(VOCABULARIES.RDF.type),
+      namedNode(HAIKU_MONUMENT_VOCAB.Event),
+    ),
   );
 
-  // イベントタイプ
-  if (event.eventType) {
-    store.addQuad(
-      eventUri,
-      namedNode(HAIKU_MONUMENT_VOCAB.eventType),
-      literal(event.eventType, "en")
+  // Event type
+  if (event.event_type) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(HAIKU_MONUMENT_VOCAB.eventType),
+        literal(event.event_type, "ja"),
+      ),
     );
   }
 
-  // HuTime正規化時間表現
-  if (event.huTimeNormalized) {
-    store.addQuad(
-      eventUri,
-      namedNode(VOCABULARIES.HUTIME.huTimeNormalized),
-      literal(event.huTimeNormalized)
+  // HuTime normalized temporal representation
+  if (event.hu_time_normalized) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.HUTIME.huTimeNormalized),
+        literal(event.hu_time_normalized),
+      ),
     );
   }
 
-  // 時間間隔の開始（xsd:date形式）
-  if (event.intervalStart) {
-    const startDate = formatToXSDDate(event.intervalStart);
-    if (startDate) {
-      store.addQuad(
-        eventUri,
+  // Interval start and end (xsd:date format)
+  if (event.interval_start) {
+    quads.push(
+      quad(
+        subject,
         namedNode(VOCABULARIES.HUTIME.intervalStart),
-        literal(startDate, namedNode(VOCABULARIES.XSD.date))
-      );
-    }
+        literal(event.interval_start, namedNode(VOCABULARIES.XSD.date)),
+      ),
+    );
   }
 
-  // 時間間隔の終了（xsd:date形式）
-  if (event.intervalEnd) {
-    const endDate = formatToXSDDate(event.intervalEnd);
-    if (endDate) {
-      store.addQuad(
-        eventUri,
+  if (event.interval_end) {
+    quads.push(
+      quad(
+        subject,
         namedNode(VOCABULARIES.HUTIME.intervalEnd),
-        literal(endDate, namedNode(VOCABULARIES.XSD.date))
-      );
-    }
-  }
-
-  // 不確実性に関する注記
-  if (event.uncertaintyNote) {
-    store.addQuad(
-      eventUri,
-      namedNode(VOCABULARIES.HUTIME.uncertaintyNote),
-      literal(event.uncertaintyNote, "ja")
+        literal(event.interval_end, namedNode(VOCABULARIES.XSD.date)),
+      ),
     );
   }
 
-  // 行為者（Actor）
+  // Uncertainty note
+  if (event.uncertainty_note) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.HUTIME.uncertaintyNote),
+        literal(event.uncertainty_note, "ja"),
+      ),
+    );
+  }
+
+  // Actor
   if (event.actor) {
-    store.addQuad(
-      eventUri,
-      namedNode(HAIKU_MONUMENT_VOCAB.actor),
-      literal(event.actor, "ja")
+    quads.push(
+      quad(
+        subject,
+        namedNode(HAIKU_MONUMENT_VOCAB.actor),
+        literal(event.actor, "ja"),
+      ),
     );
   }
 
-  // 出典へのリンク
+  // Source reference
   if (event.source) {
-    store.addQuad(
-      eventUri,
-      namedNode(VOCABULARIES.DC.source),
-      namedNode(`${RESOURCE_BASE.SOURCES}${event.source.id}`)
+    const sourceUri = `${RESOURCE_BASE.SOURCES}${event.source.id}`;
+    quads.push(
+      quad(subject, namedNode(VOCABULARIES.DC.source), namedNode(sourceUri)),
     );
   }
+
+  return quads;
+}
+
+/**
+ * 複数のEventをRDF Triplesに変換
+ */
+export function convertEventsToRDF(events: Event[]): Quad[] {
+  const quads: Quad[] = [];
+
+  for (const event of events) {
+    quads.push(...convertEventToRDF(event));
+  }
+
+  return quads;
 }

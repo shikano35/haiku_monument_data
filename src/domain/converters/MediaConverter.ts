@@ -3,97 +3,125 @@
  * IIIF Presentation API 3.0対応
  */
 
-import type { Store } from "n3";
+import type { Media } from "@/types/api";
+import { formatToISO8601 } from "@/utils/dateTimeFormatter";
+import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import type { MediaRDFEntity } from "../entities/RDFEntity";
 import {
   HAIKU_MONUMENT_VOCAB,
   RESOURCE_BASE,
   VOCABULARIES,
 } from "../vocabularies";
 
-const { namedNode, literal } = DataFactory;
+const { namedNode, literal, quad } = DataFactory;
 
 /**
- * メディアデータをRDFトリプルに変換
- * @param media - メディアデータ
- * @param store - RDFストア
+ * Media（メディア）データをRDF Triplesに変換
  */
-export function convertMediaToRDF(media: MediaRDFEntity, store: Store): void {
-  const mediaUri = namedNode(`${RESOURCE_BASE.MEDIA}${media.id}`);
+export function convertMediaToRDF(media: Media): Quad[] {
+  const quads: Quad[] = [];
+  const mediaUri = `${RESOURCE_BASE.MEDIA}${media.id}`;
+  const subject = namedNode(mediaUri);
 
-  // 基本的なクラス定義
-  store.addQuad(
-    mediaUri,
-    namedNode(VOCABULARIES.RDF.type),
-    namedNode(VOCABULARIES.SCHEMA.ImageObject)
+  // Type declarations
+  quads.push(
+    quad(
+      subject,
+      namedNode(VOCABULARIES.RDF.type),
+      namedNode(VOCABULARIES.SCHEMA.ImageObject),
+    ),
   );
 
-  // メディアタイプ
-  if (media.mediaType) {
-    store.addQuad(
-      mediaUri,
-      namedNode(HAIKU_MONUMENT_VOCAB.mediaType),
-      literal(media.mediaType, "en")
+  // Media type
+  if (media.media_type) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(HAIKU_MONUMENT_VOCAB.mediaType),
+        literal(media.media_type, "ja"),
+      ),
     );
   }
 
-  // 画像URL
+  // Content URL
   if (media.url) {
-    store.addQuad(
-      mediaUri,
-      namedNode(VOCABULARIES.SCHEMA.contentUrl),
-      namedNode(media.url)
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.SCHEMA.contentUrl),
+        namedNode(media.url),
+      ),
     );
   }
 
   // IIIF Manifest URL
-  if (media.iiifManifestUrl) {
-    store.addQuad(
-      mediaUri,
-      namedNode(HAIKU_MONUMENT_VOCAB.iiifManifestUrl),
-      namedNode(media.iiifManifestUrl)
+  if (media.iiif_manifest_url) {
+    quads.push(
+      quad(
+        subject,
+        namedNode(HAIKU_MONUMENT_VOCAB.iiifManifestUrl),
+        namedNode(media.iiif_manifest_url),
+      ),
     );
-    
-    // IIIF Manifest へのリンク
-    store.addQuad(
-      namedNode(media.iiifManifestUrl),
-      namedNode(VOCABULARIES.RDF.type),
-      namedNode(VOCABULARIES.IIIF.Manifest)
-    );
-    
-    // メディアとManifestの関連
-    store.addQuad(
-      mediaUri,
-      namedNode(VOCABULARIES.SCHEMA.associatedMedia),
-      namedNode(media.iiifManifestUrl)
+
+    // IIIF Manifest type
+    quads.push(
+      quad(
+        namedNode(media.iiif_manifest_url),
+        namedNode(VOCABULARIES.RDF.type),
+        namedNode(VOCABULARIES.IIIF.Manifest),
+      ),
     );
   }
 
-  // 撮影日時
-  if (media.capturedAt) {
-    store.addQuad(
-      mediaUri,
-      namedNode(HAIKU_MONUMENT_VOCAB.capturedAt),
-      literal(media.capturedAt, namedNode(VOCABULARIES.XSD.dateTime))
-    );
+  // Captured date
+  if (media.captured_at) {
+    const capturedAt = formatToISO8601(media.captured_at);
+    if (capturedAt) {
+      quads.push(
+        quad(
+          subject,
+          namedNode(HAIKU_MONUMENT_VOCAB.capturedAt),
+          literal(capturedAt, namedNode(VOCABULARIES.XSD.dateTime)),
+        ),
+      );
+    }
   }
 
-  // 撮影者
+  // Photographer
   if (media.photographer) {
-    store.addQuad(
-      mediaUri,
-      namedNode(HAIKU_MONUMENT_VOCAB.photographer),
-      literal(media.photographer, "ja")
+    quads.push(
+      quad(
+        subject,
+        namedNode(HAIKU_MONUMENT_VOCAB.photographer),
+        literal(media.photographer, "ja"),
+      ),
     );
   }
 
-  // ライセンス
+  // License
   if (media.license) {
-    store.addQuad(
-      mediaUri,
-      namedNode(HAIKU_MONUMENT_VOCAB.license),
-      literal(media.license)
+    quads.push(
+      quad(
+        subject,
+        namedNode(HAIKU_MONUMENT_VOCAB.license),
+        literal(media.license),
+      ),
     );
   }
+
+  return quads;
+}
+
+/**
+ * 複数のMediaをRDF Triplesに変換
+ */
+export function convertMediaListToRDF(mediaList: Media[]): Quad[] {
+  const quads: Quad[] = [];
+
+  for (const media of mediaList) {
+    quads.push(...convertMediaToRDF(media));
+  }
+
+  return quads;
 }

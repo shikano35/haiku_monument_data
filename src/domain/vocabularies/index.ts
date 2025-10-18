@@ -11,12 +11,14 @@ export const VOCABULARIES = {
   SCHEMA: {
     BASE: "http://schema.org/",
     Monument: "http://schema.org/Monument",
-    LandmarksOrHistoricalBuildings: "http://schema.org/LandmarksOrHistoricalBuildings",
+    LandmarksOrHistoricalBuildings:
+      "http://schema.org/LandmarksOrHistoricalBuildings",
     Place: "http://schema.org/Place",
     Person: "http://schema.org/Person",
     CreativeWork: "http://schema.org/CreativeWork",
     ImageObject: "http://schema.org/ImageObject",
     GeoCoordinates: "http://schema.org/GeoCoordinates",
+    Event: "http://schema.org/Event",
     name: "http://schema.org/name",
     url: "http://schema.org/url",
     contentUrl: "http://schema.org/contentUrl",
