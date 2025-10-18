@@ -23,7 +23,7 @@ describe("DateTime Formatter", () => {
     expect(iso8601).toBe("2025-05-11T16:02:33.000Z");
   });
 
-  it("should handle Date object", () => {
+  it("should handle ISO 8601 string produced by Date#toISOString()", () => {
     const date = new Date("2025-05-11T16:02:33.000Z");
     const iso8601 = formatToISO8601(date.toISOString());
     

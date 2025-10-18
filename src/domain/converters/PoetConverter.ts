@@ -78,7 +78,7 @@ export function convertPoetToRDF(poet: Poet | PoetDetail): Quad[] {
     quads.push(
       quad(
         subject,
-        namedNode(VOCABULARIES.SCHEMA.birthDate),
+        namedNode(HAIKU_MONUMENT_VOCAB.birthYear),
         literal(
           poet.birth_year.toString(),
           namedNode(VOCABULARIES.XSD.integer),
@@ -91,7 +91,7 @@ export function convertPoetToRDF(poet: Poet | PoetDetail): Quad[] {
     quads.push(
       quad(
         subject,
-        namedNode(VOCABULARIES.SCHEMA.deathDate),
+        namedNode(HAIKU_MONUMENT_VOCAB.deathYear),
         literal(
           poet.death_year.toString(),
           namedNode(VOCABULARIES.XSD.integer),

@@ -8,7 +8,7 @@ import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
 import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 
-const { namedNode, literal, quad } = DataFactory;
+const { namedNode, literal, quad, blankNode } = DataFactory;
 
 /**
  * Monument（句碑）データをRDF Triplesに変換
@@ -84,17 +84,14 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
     }
   }
 
-  if (monument.material) {
+  if (monument.material_uri) {
     quads.push(
       quad(
         subject,
-        namedNode(VOCABULARIES.SCHEMA.material),
-        literal(monument.material, "ja"),
+        namedNode(VOCABULARIES.SCHEMA.additionalType),
+        namedNode(monument.material_uri),
       ),
     );
-  }
-
-  if (monument.material_uri) {
     quads.push(
       quad(
         subject,
@@ -102,17 +99,24 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
         namedNode(monument.material_uri),
       ),
     );
-    
-    // Getty AAT URIの場合は、明示的にAAT語彙として参照
-    if (monument.material_uri.startsWith("http://vocab.getty.edu/aat/")) {
+    if (monument.material) {
       quads.push(
         quad(
           subject,
           namedNode(VOCABULARIES.SCHEMA.material),
-          namedNode(monument.material_uri),
+          literal(monument.material, "ja"),
         ),
       );
     }
+  } else if (monument.material) {
+    // URIがない場合のみリテラル値を使用
+    quads.push(
+      quad(
+        subject,
+        namedNode(VOCABULARIES.SCHEMA.material),
+        literal(monument.material, "ja"),
+      ),
+    );
   }
 
   // Temporal properties (ISO 8601 format with timezone)
@@ -214,8 +218,7 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
         );
 
         // schema:GeoCoordinates パターン
-        const geoNodeId = `_:geo_${monument.id}`;
-        const geoNode = namedNode(geoNodeId);
+        const geoNode = blankNode(`geo_${monument.id}`);
         
         quads.push(
           quad(

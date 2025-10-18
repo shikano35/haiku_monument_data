@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { convertMonumentToRDF } from "@/domain/converters/MonumentConverter";
 import type { MonumentDetail } from "@/types/api";
+import { VOCABULARIES, HAIKU_MONUMENT_VOCAB } from "@/domain/vocabularies";
 
 describe("MonumentConverter", () => {
   const mockMonument: MonumentDetail = {
@@ -99,8 +100,8 @@ describe("MonumentConverter", () => {
     
     const hasMonumentType = quads.some(
       (quad) =>
-        quad.predicate.value === "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" &&
-        quad.object.value === "http://schema.org/LandmarksOrHistoricalBuildings"
+        quad.predicate.value === VOCABULARIES.RDF.type &&
+        quad.object.value === VOCABULARIES.SCHEMA.LandmarksOrHistoricalBuildings
     );
     expect(hasMonumentType).toBe(true);
   });
@@ -110,7 +111,7 @@ describe("MonumentConverter", () => {
     
     const nameQuad = quads.find(
       (quad) =>
-        quad.predicate.value === "http://schema.org/name" &&
+        quad.predicate.value === VOCABULARIES.SCHEMA.name &&
         quad.object.value === "テスト句碑"
     );
     expect(nameQuad).toBeDefined();
@@ -125,7 +126,7 @@ describe("MonumentConverter", () => {
     
     const inscriptionRef = quads.find(
       (quad) =>
-        quad.predicate.value === "https://rdf.kuhi.jp/vocab#hasInscription"
+        quad.predicate.value === HAIKU_MONUMENT_VOCAB.hasInscription
     );
     expect(inscriptionRef).toBeDefined();
     expect(inscriptionRef?.object.value).toBe("https://rdf.kuhi.jp/inscriptions/1");
@@ -135,12 +136,12 @@ describe("MonumentConverter", () => {
     const quads = convertMonumentToRDF(mockMonument);
     
     const createdQuad = quads.find(
-      (quad) => quad.predicate.value === "http://purl.org/dc/terms/created"
+      (quad) => quad.predicate.value === VOCABULARIES.DC.created
     );
     expect(createdQuad).toBeDefined();
     expect(createdQuad?.object.value).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
     if (createdQuad && 'datatype' in createdQuad.object) {
-      expect(createdQuad.object.datatype?.value).toBe("http://www.w3.org/2001/XMLSchema#dateTime");
+      expect(createdQuad.object.datatype?.value).toBe(VOCABULARIES.XSD.dateTime);
     }
   });
 
@@ -148,7 +149,7 @@ describe("MonumentConverter", () => {
     const quads = convertMonumentToRDF(mockMonument);
     
     const locationRef = quads.find(
-      (quad) => quad.predicate.value === "http://schema.org/location"
+      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.location
     );
     expect(locationRef).toBeDefined();
     expect(locationRef?.object.value).toBe("https://rdf.kuhi.jp/locations/1");
@@ -158,11 +159,11 @@ describe("MonumentConverter", () => {
     const quads = convertMonumentToRDF(mockMonument);
     
     const latQuad = quads.find(
-      (quad) => quad.predicate.value === "http://www.w3.org/2003/01/geo/wgs84_pos#lat"
+      (quad) => quad.predicate.value === VOCABULARIES.GEO.lat
     );
     expect(latQuad).toBeDefined();
     if (latQuad && 'datatype' in latQuad.object) {
-      expect(latQuad.object.datatype?.value).toBe("http://www.w3.org/2001/XMLSchema#decimal");
+      expect(latQuad.object.datatype?.value).toBe(VOCABULARIES.XSD.decimal);
     }
   });
 
@@ -170,7 +171,7 @@ describe("MonumentConverter", () => {
     const quads = convertMonumentToRDF(mockMonument);
     
     const poetRef = quads.find(
-      (quad) => quad.predicate.value === "http://schema.org/author"
+      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.author
     );
     expect(poetRef).toBeDefined();
     expect(poetRef?.object.value).toBe("https://rdf.kuhi.jp/poets/1");
@@ -181,7 +182,7 @@ describe("MonumentConverter", () => {
     const quads = convertMonumentToRDF(monumentWithoutInscriptions);
     
     const hasInscription = quads.some(
-      (quad) => quad.predicate.value === "https://rdf.kuhi.jp/vocab#hasInscription"
+      (quad) => quad.predicate.value === HAIKU_MONUMENT_VOCAB.hasInscription
     );
     expect(hasInscription).toBe(false);
   });
@@ -201,7 +202,7 @@ describe("MonumentConverter", () => {
     const quads = convertMonumentToRDF(monumentWithMultipleLocations);
     
     const locationRefs = quads.filter(
-      (quad) => quad.predicate.value === "http://schema.org/location"
+      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.location
     );
     expect(locationRefs.length).toBe(2);
   });

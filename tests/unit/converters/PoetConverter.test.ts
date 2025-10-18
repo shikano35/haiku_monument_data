@@ -95,12 +95,12 @@ describe("PoetConverter", () => {
     }
   });
 
-  it("should include birth and death years with xsd:integer", () => {
+  it("should include birth and death years with xsd:integer using custom properties", () => {
     const quads = convertPoetToRDF(mockPoet);
 
     const birthYearQuad = quads.find(
       (q) =>
-        q.predicate.value === VOCABULARIES.SCHEMA.birthDate &&
+        q.predicate.value === HAIKU_MONUMENT_VOCAB.birthYear &&
         q.object.value === String(mockPoet.birth_year)
     );
     expect(birthYearQuad).toBeDefined();
@@ -110,7 +110,7 @@ describe("PoetConverter", () => {
 
     const deathYearQuad = quads.find(
       (q) =>
-        q.predicate.value === VOCABULARIES.SCHEMA.deathDate &&
+        q.predicate.value === HAIKU_MONUMENT_VOCAB.deathYear &&
         q.object.value === String(mockPoet.death_year)
     );
     expect(deathYearQuad).toBeDefined();
