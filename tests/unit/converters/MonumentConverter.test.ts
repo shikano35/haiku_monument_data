@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { convertMonumentToRDF } from "@/domain/converters/MonumentConverter";
 import type { MonumentDetail } from "@/types/api";
-import { Store } from "n3";
 
 describe("MonumentConverter", () => {
   const mockMonument: MonumentDetail = {

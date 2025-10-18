@@ -1,10 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { Store, DataFactory } from "n3";
 import { convertLocationToRDF } from "@/domain/converters/LocationConverter";
 import type { Location } from "@/types/api";
 import { VOCABULARIES, HAIKU_MONUMENT_VOCAB } from "@/domain/vocabularies";
-
-const { quad } = DataFactory;
 
 describe("LocationConverter", () => {
   const mockLocation: Location = {

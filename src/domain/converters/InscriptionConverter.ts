@@ -3,7 +3,7 @@ import type { Inscription } from "@/types/api";
 import type { Store } from "n3";
 import { DataFactory } from "n3";
 
-const { namedNode, literal, quad, blankNode } = DataFactory;
+const { namedNode, literal, quad } = DataFactory;
 
 export interface InscriptionRDF {
   id: number;
@@ -130,7 +130,7 @@ export function convertInscriptionToRDF(
 /**
  * API型からRDF型への変換ヘルパー
  */
-export function inscriptionApiToRDF(inscription: Inscription, monumentId: number): InscriptionRDF {
+export function inscriptionApiToRDF(inscription: Inscription, _monumentId: number): InscriptionRDF {
   return {
     id: inscription.id,
     side: inscription.side,
