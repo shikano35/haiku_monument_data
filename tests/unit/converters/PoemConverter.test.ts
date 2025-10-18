@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
 import { convertPoemToRDF } from "@/domain/converters/PoemConverter";
+import { HAIKU_MONUMENT_VOCAB, VOCABULARIES } from "@/domain/vocabularies";
 import type { Poem } from "@/types/api";
-import { VOCABULARIES, HAIKU_MONUMENT_VOCAB } from "@/domain/vocabularies";
+import { describe, expect, it } from "vitest";
 
 describe("PoemConverter", () => {
   const mockPoem: Poem = {
@@ -36,14 +36,14 @@ describe("PoemConverter", () => {
     const creativeWorkQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.RDF.type &&
-        q.object.value === VOCABULARIES.SCHEMA.CreativeWork
+        q.object.value === VOCABULARIES.SCHEMA.CreativeWork,
     );
     expect(creativeWorkQuad).toBeDefined();
 
     const haikuQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.RDF.type &&
-        q.object.value === HAIKU_MONUMENT_VOCAB.Haiku
+        q.object.value === HAIKU_MONUMENT_VOCAB.Haiku,
     );
     expect(haikuQuad).toBeDefined();
   });
@@ -54,7 +54,7 @@ describe("PoemConverter", () => {
     const textQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.SCHEMA.text &&
-        q.object.value === mockPoem.text
+        q.object.value === mockPoem.text,
     );
 
     expect(textQuad).toBeDefined();
@@ -69,7 +69,7 @@ describe("PoemConverter", () => {
     const normalizedTextQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.normalizedText &&
-        q.object.value === mockPoem.normalized_text
+        q.object.value === mockPoem.normalized_text,
     );
 
     expect(normalizedTextQuad).toBeDefined();
@@ -84,7 +84,7 @@ describe("PoemConverter", () => {
     const textHashQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.textHash &&
-        q.object.value === mockPoem.text_hash
+        q.object.value === mockPoem.text_hash,
     );
 
     expect(textHashQuad).toBeDefined();
@@ -96,7 +96,7 @@ describe("PoemConverter", () => {
     const languageQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.SCHEMA.inLanguage &&
-        q.object.value === "ja"
+        q.object.value === "ja",
     );
 
     expect(languageQuad).toBeDefined();
@@ -108,7 +108,7 @@ describe("PoemConverter", () => {
     const kigoQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.kigo &&
-        q.object.value === mockPoem.kigo
+        q.object.value === mockPoem.kigo,
     );
 
     expect(kigoQuad).toBeDefined();
@@ -123,7 +123,7 @@ describe("PoemConverter", () => {
     const seasonQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.season &&
-        q.object.value === mockPoem.season
+        q.object.value === mockPoem.season,
     );
 
     expect(seasonQuad).toBeDefined();
@@ -147,12 +147,12 @@ describe("PoemConverter", () => {
     const quads = convertPoemToRDF(poemWithoutOptionals);
 
     const kigoQuad = quads.find(
-      (q) => q.predicate.value === HAIKU_MONUMENT_VOCAB.kigo
+      (q) => q.predicate.value === HAIKU_MONUMENT_VOCAB.kigo,
     );
     expect(kigoQuad).toBeUndefined();
 
     const seasonQuad = quads.find(
-      (q) => q.predicate.value === HAIKU_MONUMENT_VOCAB.season
+      (q) => q.predicate.value === HAIKU_MONUMENT_VOCAB.season,
     );
     expect(seasonQuad).toBeUndefined();
   });

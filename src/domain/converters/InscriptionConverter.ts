@@ -1,4 +1,8 @@
-import { HAIKU_MONUMENT_VOCAB, RESOURCE_BASE, VOCABULARIES } from "@/domain/vocabularies";
+import {
+  HAIKU_MONUMENT_VOCAB,
+  RESOURCE_BASE,
+  VOCABULARIES,
+} from "@/domain/vocabularies";
 import type { Inscription } from "@/types/api";
 import type { Store } from "n3";
 import { DataFactory } from "n3";
@@ -26,7 +30,7 @@ export interface InscriptionRDF {
  */
 export function convertInscriptionToRDF(
   inscription: InscriptionRDF,
-  store: Store
+  store: Store,
 ): void {
   const subject = namedNode(inscription.uri);
 
@@ -35,8 +39,8 @@ export function convertInscriptionToRDF(
     quad(
       subject,
       namedNode(VOCABULARIES.RDF.type),
-      namedNode(HAIKU_MONUMENT_VOCAB.Inscription)
-    )
+      namedNode(HAIKU_MONUMENT_VOCAB.Inscription),
+    ),
   );
 
   // Side (front, back, left, right, etc.)
@@ -44,8 +48,8 @@ export function convertInscriptionToRDF(
     quad(
       subject,
       namedNode(HAIKU_MONUMENT_VOCAB.side),
-      literal(inscription.side, "en")
-    )
+      literal(inscription.side, "en"),
+    ),
   );
 
   // Original text
@@ -54,8 +58,8 @@ export function convertInscriptionToRDF(
       quad(
         subject,
         namedNode(HAIKU_MONUMENT_VOCAB.originalText),
-        literal(inscription.originalText, inscription.language || "ja")
-      )
+        literal(inscription.originalText, inscription.language || "ja"),
+      ),
     );
   }
 
@@ -65,8 +69,8 @@ export function convertInscriptionToRDF(
       quad(
         subject,
         namedNode(HAIKU_MONUMENT_VOCAB.transliteration),
-        literal(inscription.transliteration, inscription.language || "ja")
-      )
+        literal(inscription.transliteration, inscription.language || "ja"),
+      ),
     );
   }
 
@@ -76,8 +80,8 @@ export function convertInscriptionToRDF(
       quad(
         subject,
         namedNode(HAIKU_MONUMENT_VOCAB.reading),
-        literal(inscription.reading, inscription.language || "ja")
-      )
+        literal(inscription.reading, inscription.language || "ja"),
+      ),
     );
   }
 
@@ -86,8 +90,8 @@ export function convertInscriptionToRDF(
     quad(
       subject,
       namedNode(VOCABULARIES.SCHEMA.inLanguage),
-      literal(inscription.language)
-    )
+      literal(inscription.language),
+    ),
   );
 
   // Notes
@@ -96,8 +100,8 @@ export function convertInscriptionToRDF(
       quad(
         subject,
         namedNode(VOCABULARIES.RDFS.comment),
-        literal(inscription.notes, inscription.language || "ja")
-      )
+        literal(inscription.notes, inscription.language || "ja"),
+      ),
     );
   }
 
@@ -109,8 +113,8 @@ export function convertInscriptionToRDF(
         quad(
           subject,
           namedNode(HAIKU_MONUMENT_VOCAB.hasPoem),
-          namedNode(poemUri)
-        )
+          namedNode(poemUri),
+        ),
       );
     }
   }
@@ -121,8 +125,8 @@ export function convertInscriptionToRDF(
       quad(
         subject,
         namedNode(VOCABULARIES.DC.source),
-        namedNode(inscription.source.uri)
-      )
+        namedNode(inscription.source.uri),
+      ),
     );
   }
 }
@@ -130,7 +134,10 @@ export function convertInscriptionToRDF(
 /**
  * API型からRDF型への変換ヘルパー
  */
-export function inscriptionApiToRDF(inscription: Inscription, _monumentId: number): InscriptionRDF {
+export function inscriptionApiToRDF(
+  inscription: Inscription,
+  _monumentId: number,
+): InscriptionRDF {
   return {
     id: inscription.id,
     side: inscription.side,
@@ -139,7 +146,7 @@ export function inscriptionApiToRDF(inscription: Inscription, _monumentId: numbe
     reading: inscription.reading ?? undefined,
     language: inscription.language || "ja",
     notes: inscription.notes ?? undefined,
-    poems: inscription.poems?.map(p => ({ id: p.id })),
+    poems: inscription.poems?.map((p) => ({ id: p.id })),
     source: inscription.source
       ? {
           id: inscription.source.id,

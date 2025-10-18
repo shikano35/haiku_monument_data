@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
 import { convertMonumentToRDF } from "@/domain/converters/MonumentConverter";
+import { HAIKU_MONUMENT_VOCAB, VOCABULARIES } from "@/domain/vocabularies";
 import type { MonumentDetail } from "@/types/api";
-import { VOCABULARIES, HAIKU_MONUMENT_VOCAB } from "@/domain/vocabularies";
+import { describe, expect, it } from "vitest";
 
 describe("MonumentConverter", () => {
   const mockMonument: MonumentDetail = {
@@ -88,68 +88,74 @@ describe("MonumentConverter", () => {
   it("should have correct Monument URI", () => {
     const quads = convertMonumentToRDF(mockMonument);
     const monumentUri = "https://rdf.kuhi.jp/monuments/1";
-    
+
     const hasMonumentSubject = quads.some(
-      (quad) => quad.subject.value === monumentUri
+      (quad) => quad.subject.value === monumentUri,
     );
     expect(hasMonumentSubject).toBe(true);
   });
 
   it("should include Monument type", () => {
     const quads = convertMonumentToRDF(mockMonument);
-    
+
     const hasMonumentType = quads.some(
       (quad) =>
         quad.predicate.value === VOCABULARIES.RDF.type &&
-        quad.object.value === VOCABULARIES.SCHEMA.LandmarksOrHistoricalBuildings
+        quad.object.value ===
+          VOCABULARIES.SCHEMA.LandmarksOrHistoricalBuildings,
     );
     expect(hasMonumentType).toBe(true);
   });
 
   it("should include monument name with language tag", () => {
     const quads = convertMonumentToRDF(mockMonument);
-    
+
     const nameQuad = quads.find(
       (quad) =>
         quad.predicate.value === VOCABULARIES.SCHEMA.name &&
-        quad.object.value === "テスト句碑"
+        quad.object.value === "テスト句碑",
     );
     expect(nameQuad).toBeDefined();
     // Literal型の場合にlanguageプロパティが存在
-    if (nameQuad && 'language' in nameQuad.object) {
+    if (nameQuad && "language" in nameQuad.object) {
       expect(nameQuad.object.language).toBe("ja");
     }
   });
 
   it("should reference Inscription with named URI", () => {
     const quads = convertMonumentToRDF(mockMonument);
-    
+
     const inscriptionRef = quads.find(
-      (quad) =>
-        quad.predicate.value === HAIKU_MONUMENT_VOCAB.hasInscription
+      (quad) => quad.predicate.value === HAIKU_MONUMENT_VOCAB.hasInscription,
     );
     expect(inscriptionRef).toBeDefined();
-    expect(inscriptionRef?.object.value).toBe("https://rdf.kuhi.jp/inscriptions/1");
+    expect(inscriptionRef?.object.value).toBe(
+      "https://rdf.kuhi.jp/inscriptions/1",
+    );
   });
 
   it("should include DateTime in ISO 8601 format", () => {
     const quads = convertMonumentToRDF(mockMonument);
-    
+
     const createdQuad = quads.find(
-      (quad) => quad.predicate.value === VOCABULARIES.DC.created
+      (quad) => quad.predicate.value === VOCABULARIES.DC.created,
     );
     expect(createdQuad).toBeDefined();
-    expect(createdQuad?.object.value).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
-    if (createdQuad && 'datatype' in createdQuad.object) {
-      expect(createdQuad.object.datatype?.value).toBe(VOCABULARIES.XSD.dateTime);
+    expect(createdQuad?.object.value).toMatch(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/,
+    );
+    if (createdQuad && "datatype" in createdQuad.object) {
+      expect(createdQuad.object.datatype?.value).toBe(
+        VOCABULARIES.XSD.dateTime,
+      );
     }
   });
 
   it("should reference Location", () => {
     const quads = convertMonumentToRDF(mockMonument);
-    
+
     const locationRef = quads.find(
-      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.location
+      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.location,
     );
     expect(locationRef).toBeDefined();
     expect(locationRef?.object.value).toBe("https://rdf.kuhi.jp/locations/1");
@@ -157,21 +163,21 @@ describe("MonumentConverter", () => {
 
   it("should include GeoCoordinates with xsd:decimal", () => {
     const quads = convertMonumentToRDF(mockMonument);
-    
+
     const latQuad = quads.find(
-      (quad) => quad.predicate.value === VOCABULARIES.GEO.lat
+      (quad) => quad.predicate.value === VOCABULARIES.GEO.lat,
     );
     expect(latQuad).toBeDefined();
-    if (latQuad && 'datatype' in latQuad.object) {
+    if (latQuad && "datatype" in latQuad.object) {
       expect(latQuad.object.datatype?.value).toBe(VOCABULARIES.XSD.decimal);
     }
   });
 
   it("should reference Poet", () => {
     const quads = convertMonumentToRDF(mockMonument);
-    
+
     const poetRef = quads.find(
-      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.author
+      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.author,
     );
     expect(poetRef).toBeDefined();
     expect(poetRef?.object.value).toBe("https://rdf.kuhi.jp/poets/1");
@@ -180,9 +186,9 @@ describe("MonumentConverter", () => {
   it("should handle empty inscriptions array", () => {
     const monumentWithoutInscriptions = { ...mockMonument, inscriptions: [] };
     const quads = convertMonumentToRDF(monumentWithoutInscriptions);
-    
+
     const hasInscription = quads.some(
-      (quad) => quad.predicate.value === HAIKU_MONUMENT_VOCAB.hasInscription
+      (quad) => quad.predicate.value === HAIKU_MONUMENT_VOCAB.hasInscription,
     );
     expect(hasInscription).toBe(false);
   });
@@ -200,9 +206,9 @@ describe("MonumentConverter", () => {
       ],
     };
     const quads = convertMonumentToRDF(monumentWithMultipleLocations);
-    
+
     const locationRefs = quads.filter(
-      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.location
+      (quad) => quad.predicate.value === VOCABULARIES.SCHEMA.location,
     );
     expect(locationRefs.length).toBe(2);
   });

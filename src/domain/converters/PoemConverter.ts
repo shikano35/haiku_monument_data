@@ -4,9 +4,9 @@ import {
   VOCABULARIES,
 } from "@/domain/vocabularies";
 import type { Poem, PoemDetail } from "@/types/api";
+import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 
 const { namedNode, literal, quad } = DataFactory;
 

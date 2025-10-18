@@ -4,9 +4,9 @@ import {
   VOCABULARIES,
 } from "@/domain/vocabularies";
 import type { Location, LocationDetail } from "@/types/api";
+import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 
 const { namedNode, literal, quad } = DataFactory;
 
@@ -55,13 +55,15 @@ export function convertLocationToRDF(
         literal(location.imi_pref_code),
       ),
     );
-    
+
     // IMI Prefecture URIへのリンク
     quads.push(
       quad(
         subject,
         namedNode(VOCABULARIES.RDF.type),
-        namedNode(`${VOCABULARIES.IMI.PrefectureBase}${location.imi_pref_code}`),
+        namedNode(
+          `${VOCABULARIES.IMI.PrefectureBase}${location.imi_pref_code}`,
+        ),
       ),
     );
   }
