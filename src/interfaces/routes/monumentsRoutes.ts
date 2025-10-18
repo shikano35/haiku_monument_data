@@ -1,9 +1,9 @@
 import {
+  convertEventToRDF,
+  convertInscriptionToRDF,
+  convertMediaToRDF,
   convertMonumentToRDF,
   convertMonumentsToRDF,
-  convertEventToRDF,
-  convertMediaToRDF,
-  convertInscriptionToRDF,
   inscriptionApiToRDF,
 } from "@/domain/converters";
 import { HaikuMonumentApiClient } from "@/infrastructure/api/HaikuMonumentApiClient";
@@ -68,78 +68,78 @@ monumentsRoutes.get("/:id", async (c) => {
 
     const monument = await client.getMonument(id, "all");
     const quads = convertMonumentToRDF(monument);
-    
+
     // Store を作成
     const store = new Store(quads);
-    
+
     // Inscriptionsデータを埋め込み形式でRDF化
     if (monument.inscriptions && monument.inscriptions.length > 0) {
       for (const inscription of monument.inscriptions) {
         convertInscriptionToRDF(
           inscriptionApiToRDF(inscription, monument.id),
-          store
+          store,
         );
       }
     }
-    
+
     // Eventsデータも追加でRDF化
     if (monument.events && monument.events.length > 0) {
       for (const event of monument.events) {
-        convertEventToRDF(
-          {
-            id: event.id,
-            eventType: event.event_type,
-            huTimeNormalized: event.hu_time_normalized ?? undefined,
-            intervalStart: event.interval_start ?? undefined,
-            intervalEnd: event.interval_end ?? undefined,
-            uncertaintyNote: event.uncertainty_note ?? undefined,
-            actor: event.actor ?? undefined,
-            source: event.source
-              ? {
-                  id: event.source.id,
-                  citation: event.source.citation,
-                  author: event.source.author ?? undefined,
-                  title: event.source.title ?? undefined,
-                  publisher: event.source.publisher ?? undefined,
-                  sourceYear: event.source.source_year ?? undefined,
-                  url: event.source.url ?? undefined,
-                  createdAt: new Date(event.source.created_at),
-                  updatedAt: new Date(event.source.updated_at),
-                  uri: `https://rdf.kuhi.jp/sources/${event.source.id}`,
-                }
-              : undefined,
-            uri: `https://rdf.kuhi.jp/events/${event.id}`,
-          },
-          store
-        );
+        const eventQuads = convertEventToRDF({
+          id: event.id,
+          event_type: event.event_type,
+          hu_time_normalized: event.hu_time_normalized,
+          interval_start: event.interval_start,
+          interval_end: event.interval_end,
+          uncertainty_note: event.uncertainty_note,
+          actor: event.actor,
+          source: event.source
+            ? {
+                id: event.source.id,
+                citation: event.source.citation,
+                author: event.source.author,
+                title: event.source.title,
+                publisher: event.source.publisher,
+                source_year: event.source.source_year,
+                url: event.source.url,
+                created_at: event.source.created_at,
+                updated_at: event.source.updated_at,
+              }
+            : null,
+        });
+        for (const q of eventQuads) {
+          store.addQuad(q);
+        }
       }
     }
-    
+
     // Mediaデータも追加でRDF化
     if (monument.media && monument.media.length > 0) {
       for (const media of monument.media) {
-        convertMediaToRDF(
-          {
-            id: media.id,
-            mediaType: media.media_type,
-            url: media.url,
-            iiifManifestUrl: media.iiif_manifest_url ?? undefined,
-            capturedAt: media.captured_at ?? undefined,
-            photographer: media.photographer ?? undefined,
-            license: media.license ?? undefined,
-            exif: media.exif ?? undefined,
-            primary: media.primary ?? undefined,
-            order: media.order ?? undefined,
-            uri: `https://rdf.kuhi.jp/media/${media.id}`,
-          },
-          store
-        );
+        const mediaQuads = convertMediaToRDF({
+          id: media.id,
+          media_type: media.media_type,
+          url: media.url,
+          iiif_manifest_url: media.iiif_manifest_url,
+          captured_at: media.captured_at,
+          photographer: media.photographer,
+          license: media.license,
+          exif: media.exif,
+          primary: media.primary,
+          order: media.order,
+        });
+        for (const q of mediaQuads) {
+          store.addQuad(q);
+        }
       }
     }
 
     const acceptHeader = c.req.header("Accept");
     const format = negotiateFormat(acceptHeader);
-    const rdf = await serializeRDF(store.getQuads(null, null, null, null), format);
+    const rdf = await serializeRDF(
+      store.getQuads(null, null, null, null),
+      format,
+    );
 
     c.header("Content-Type", `${getContentType(format)}; charset=utf-8`);
 

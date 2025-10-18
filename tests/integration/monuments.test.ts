@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { DataFactory } from "n3";
-import { serializeRDF } from "@/infrastructure/rdf/serializer";
 import { VOCABULARIES } from "@/domain/vocabularies";
+import { serializeRDF } from "@/infrastructure/rdf/serializer";
+import { DataFactory } from "n3";
+import { describe, expect, it } from "vitest";
 
 const { namedNode, literal, quad } = DataFactory;
 
@@ -10,12 +10,12 @@ describe("RDF Serializer", () => {
     quad(
       namedNode("https://rdf.kuhi.jp/monuments/1"),
       namedNode(VOCABULARIES.RDF.type),
-      namedNode(VOCABULARIES.SCHEMA.LandmarksOrHistoricalBuildings)
+      namedNode(VOCABULARIES.SCHEMA.LandmarksOrHistoricalBuildings),
     ),
     quad(
       namedNode("https://rdf.kuhi.jp/monuments/1"),
       namedNode(VOCABULARIES.SCHEMA.name),
-      literal("芭蕉記念碑", "ja")
+      literal("芭蕉記念碑", "ja"),
     ),
   ];
 
@@ -31,7 +31,9 @@ describe("RDF Serializer", () => {
     const result = await serializeRDF(testQuads, "application/n-triples");
 
     expect(result).toContain("<https://rdf.kuhi.jp/monuments/1>");
-    expect(result).toContain(`<${VOCABULARIES.SCHEMA.LandmarksOrHistoricalBuildings}>`);
+    expect(result).toContain(
+      `<${VOCABULARIES.SCHEMA.LandmarksOrHistoricalBuildings}>`,
+    );
     expect(result).toContain('"芭蕉記念碑"@ja');
   });
 

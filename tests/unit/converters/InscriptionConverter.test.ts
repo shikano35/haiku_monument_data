@@ -1,7 +1,10 @@
-import { describe, it, expect } from "vitest";
-import { convertInscriptionToRDF, inscriptionApiToRDF } from "@/domain/converters/InscriptionConverter";
+import {
+  convertInscriptionToRDF,
+  inscriptionApiToRDF,
+} from "@/domain/converters/InscriptionConverter";
 import type { Inscription } from "@/types/api";
 import { Store } from "n3";
+import { describe, expect, it } from "vitest";
 
 describe("InscriptionConverter", () => {
   const mockInscription: Inscription = {
@@ -40,9 +43,9 @@ describe("InscriptionConverter", () => {
   it("should convert Inscription to RDF and add to Store", () => {
     const rdfInscription = inscriptionApiToRDF(mockInscription, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
+
     const quads = store.getQuads(null, null, null, null);
     expect(quads.length).toBeGreaterThan(0);
   });
@@ -50,14 +53,14 @@ describe("InscriptionConverter", () => {
   it("should use named URI instead of blank node", () => {
     const rdfInscription = inscriptionApiToRDF(mockInscription, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
+
     const inscriptionUri = "https://rdf.kuhi.jp/inscriptions/1";
     const quads = store.getQuads(null, null, null, null);
-    
+
     const hasNamedSubject = quads.some(
-      (quad) => quad.subject.value === inscriptionUri
+      (quad) => quad.subject.value === inscriptionUri,
     );
     expect(hasNamedSubject).toBe(true);
   });
@@ -65,54 +68,63 @@ describe("InscriptionConverter", () => {
   it("should include Inscription type", () => {
     const rdfInscription = inscriptionApiToRDF(mockInscription, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
-    const typeQuad = store.getQuads(null, null, null, null).find(
-      (quad) =>
-        quad.predicate.value === "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" &&
-        quad.object.value === "https://rdf.kuhi.jp/vocab#Inscription"
-    );
+
+    const typeQuad = store
+      .getQuads(null, null, null, null)
+      .find(
+        (quad) =>
+          quad.predicate.value ===
+            "http://www.w3.org/1999/02/22-rdf-syntax-ns#type" &&
+          quad.object.value === "https://rdf.kuhi.jp/vocab#Inscription",
+      );
     expect(typeQuad).toBeDefined();
   });
 
   it("should include side property", () => {
     const rdfInscription = inscriptionApiToRDF(mockInscription, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
-    const sideQuad = store.getQuads(null, null, null, null).find(
-      (quad) =>
-        quad.predicate.value === "https://rdf.kuhi.jp/vocab#side" &&
-        quad.object.value === "front"
-    );
+
+    const sideQuad = store
+      .getQuads(null, null, null, null)
+      .find(
+        (quad) =>
+          quad.predicate.value === "https://rdf.kuhi.jp/vocab#side" &&
+          quad.object.value === "front",
+      );
     expect(sideQuad).toBeDefined();
   });
 
   it("should include originalText with language tag", () => {
     const rdfInscription = inscriptionApiToRDF(mockInscription, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
-    const textQuad = store.getQuads(null, null, null, null).find(
-      (quad) =>
-        quad.predicate.value === "https://rdf.kuhi.jp/vocab#originalText" &&
-        quad.object.value === "古池や蛙飛び込む水の音"
-    );
+
+    const textQuad = store
+      .getQuads(null, null, null, null)
+      .find(
+        (quad) =>
+          quad.predicate.value === "https://rdf.kuhi.jp/vocab#originalText" &&
+          quad.object.value === "古池や蛙飛び込む水の音",
+      );
     expect(textQuad).toBeDefined();
   });
 
   it("should reference Poem with named URI", () => {
     const rdfInscription = inscriptionApiToRDF(mockInscription, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
-    const poemRef = store.getQuads(null, null, null, null).find(
-      (quad) => quad.predicate.value === "https://rdf.kuhi.jp/vocab#hasPoem"
-    );
+
+    const poemRef = store
+      .getQuads(null, null, null, null)
+      .find(
+        (quad) => quad.predicate.value === "https://rdf.kuhi.jp/vocab#hasPoem",
+      );
     expect(poemRef).toBeDefined();
     expect(poemRef?.object.value).toBe("https://rdf.kuhi.jp/poems/1");
   });
@@ -120,26 +132,34 @@ describe("InscriptionConverter", () => {
   it("should reference Source when provided", () => {
     const rdfInscription = inscriptionApiToRDF(mockInscription, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
-    const sourceRef = store.getQuads(null, null, null, null).find(
-      (quad) => quad.predicate.value === "http://purl.org/dc/terms/source"
-    );
+
+    const sourceRef = store
+      .getQuads(null, null, null, null)
+      .find(
+        (quad) => quad.predicate.value === "http://purl.org/dc/terms/source",
+      );
     expect(sourceRef).toBeDefined();
     expect(sourceRef?.object.value).toBe("https://rdf.kuhi.jp/sources/1");
   });
 
   it("should handle optional transliteration", () => {
-    const inscriptionWithoutTranslit = { ...mockInscription, transliteration: null };
+    const inscriptionWithoutTranslit = {
+      ...mockInscription,
+      transliteration: null,
+    };
     const rdfInscription = inscriptionApiToRDF(inscriptionWithoutTranslit, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
-    const translitQuad = store.getQuads(null, null, null, null).find(
-      (quad) => quad.predicate.value === "https://rdf.kuhi.jp/vocab#transliteration"
-    );
+
+    const translitQuad = store
+      .getQuads(null, null, null, null)
+      .find(
+        (quad) =>
+          quad.predicate.value === "https://rdf.kuhi.jp/vocab#transliteration",
+      );
     expect(translitQuad).toBeUndefined();
   });
 
@@ -147,12 +167,14 @@ describe("InscriptionConverter", () => {
     const inscriptionWithoutReading = { ...mockInscription, reading: null };
     const rdfInscription = inscriptionApiToRDF(inscriptionWithoutReading, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
-    const readingQuad = store.getQuads(null, null, null, null).find(
-      (quad) => quad.predicate.value === "https://rdf.kuhi.jp/vocab#reading"
-    );
+
+    const readingQuad = store
+      .getQuads(null, null, null, null)
+      .find(
+        (quad) => quad.predicate.value === "https://rdf.kuhi.jp/vocab#reading",
+      );
     expect(readingQuad).toBeUndefined();
   });
 
@@ -160,12 +182,14 @@ describe("InscriptionConverter", () => {
     const inscriptionWithoutSource = { ...mockInscription, source: null };
     const rdfInscription = inscriptionApiToRDF(inscriptionWithoutSource, 1);
     const store = new Store();
-    
+
     convertInscriptionToRDF(rdfInscription, store);
-    
-    const sourceRef = store.getQuads(null, null, null, null).find(
-      (quad) => quad.predicate.value === "http://purl.org/dc/terms/source"
-    );
+
+    const sourceRef = store
+      .getQuads(null, null, null, null)
+      .find(
+        (quad) => quad.predicate.value === "http://purl.org/dc/terms/source",
+      );
     expect(sourceRef).toBeUndefined();
   });
 });

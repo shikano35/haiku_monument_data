@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
 import { convertLocationToRDF } from "@/domain/converters/LocationConverter";
+import { HAIKU_MONUMENT_VOCAB, VOCABULARIES } from "@/domain/vocabularies";
 import type { Location } from "@/types/api";
-import { VOCABULARIES, HAIKU_MONUMENT_VOCAB } from "@/domain/vocabularies";
+import { describe, expect, it } from "vitest";
 
 describe("LocationConverter", () => {
   const mockLocation: Location = {
@@ -42,7 +42,7 @@ describe("LocationConverter", () => {
     const typeQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.RDF.type &&
-        q.object.value === VOCABULARIES.SCHEMA.Place
+        q.object.value === VOCABULARIES.SCHEMA.Place,
     );
 
     expect(typeQuad).toBeDefined();
@@ -54,7 +54,7 @@ describe("LocationConverter", () => {
     const nameQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.SCHEMA.name &&
-        q.object.value === mockLocation.place_name
+        q.object.value === mockLocation.place_name,
     );
 
     expect(nameQuad).toBeDefined();
@@ -69,7 +69,7 @@ describe("LocationConverter", () => {
     const regionQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.region &&
-        q.object.value === mockLocation.region
+        q.object.value === mockLocation.region,
     );
 
     expect(regionQuad).toBeDefined();
@@ -84,7 +84,7 @@ describe("LocationConverter", () => {
     const prefectureQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.prefecture &&
-        q.object.value === mockLocation.prefecture
+        q.object.value === mockLocation.prefecture,
     );
     expect(prefectureQuad).toBeDefined();
     if ("language" in prefectureQuad!.object) {
@@ -94,7 +94,7 @@ describe("LocationConverter", () => {
     const municipalityQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.municipality &&
-        q.object.value === mockLocation.municipality
+        q.object.value === mockLocation.municipality,
     );
     expect(municipalityQuad).toBeDefined();
     if ("language" in municipalityQuad!.object) {
@@ -108,21 +108,25 @@ describe("LocationConverter", () => {
     const latitudeQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.GEO.lat &&
-        q.object.value === String(mockLocation.latitude)
+        q.object.value === String(mockLocation.latitude),
     );
     expect(latitudeQuad).toBeDefined();
     if ("datatype" in latitudeQuad!.object) {
-      expect(latitudeQuad!.object.datatype.value).toBe(VOCABULARIES.XSD.decimal);
+      expect(latitudeQuad!.object.datatype.value).toBe(
+        VOCABULARIES.XSD.decimal,
+      );
     }
 
     const longitudeQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.GEO.long &&
-        q.object.value === String(mockLocation.longitude)
+        q.object.value === String(mockLocation.longitude),
     );
     expect(longitudeQuad).toBeDefined();
     if ("datatype" in longitudeQuad!.object) {
-      expect(longitudeQuad!.object.datatype.value).toBe(VOCABULARIES.XSD.decimal);
+      expect(longitudeQuad!.object.datatype.value).toBe(
+        VOCABULARIES.XSD.decimal,
+      );
     }
   });
 
@@ -132,7 +136,7 @@ describe("LocationConverter", () => {
     const addressQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.SCHEMA.address &&
-        q.object.value === mockLocation.address
+        q.object.value === mockLocation.address,
     );
 
     expect(addressQuad).toBeDefined();
@@ -150,7 +154,7 @@ describe("LocationConverter", () => {
     const quads = convertLocationToRDF(locationWithoutAddress);
 
     const addressQuad = quads.find(
-      (q) => q.predicate.value === VOCABULARIES.SCHEMA.address
+      (q) => q.predicate.value === VOCABULARIES.SCHEMA.address,
     );
 
     expect(addressQuad).toBeUndefined();
@@ -166,14 +170,13 @@ describe("LocationConverter", () => {
     const quads = convertLocationToRDF(locationWithoutCoords);
 
     const latQuad = quads.find(
-      (q) => q.predicate.value === VOCABULARIES.GEO.lat
+      (q) => q.predicate.value === VOCABULARIES.GEO.lat,
     );
     const longQuad = quads.find(
-      (q) => q.predicate.value === VOCABULARIES.GEO.long
+      (q) => q.predicate.value === VOCABULARIES.GEO.long,
     );
 
     expect(latQuad).toBeUndefined();
     expect(longQuad).toBeUndefined();
   });
 });
-

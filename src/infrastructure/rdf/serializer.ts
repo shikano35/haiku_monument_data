@@ -1,6 +1,6 @@
+import { HAIKU_MONUMENT_VOCAB, VOCABULARIES } from "@/domain/vocabularies";
 import type { RDFFormat } from "@/types";
 import type { Quad } from "@rdfjs/types";
-import { VOCABULARIES, HAIKU_MONUMENT_VOCAB } from "@/domain/vocabularies";
 /**
  * RDFシリアライザー
  * N3.jsを使用してRDFデータを各種フォーマットに変換
@@ -38,7 +38,7 @@ export async function serializeRDF(
 ): Promise<string> {
   return new Promise((resolve, reject) => {
     const writerFormat = mapFormatToN3Format(format);
-    const writer = new Writer({ 
+    const writer = new Writer({
       format: writerFormat,
       prefixes: DEFAULT_PREFIXES,
     });

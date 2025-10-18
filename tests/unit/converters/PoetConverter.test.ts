@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
 import { convertPoetToRDF } from "@/domain/converters/PoetConverter";
+import { HAIKU_MONUMENT_VOCAB, VOCABULARIES } from "@/domain/vocabularies";
 import type { Poet } from "@/types/api";
-import { VOCABULARIES, HAIKU_MONUMENT_VOCAB } from "@/domain/vocabularies";
+import { describe, expect, it } from "vitest";
 
 describe("PoetConverter", () => {
   const mockPoet: Poet = {
@@ -38,14 +38,14 @@ describe("PoetConverter", () => {
     const schemaPersonQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.RDF.type &&
-        q.object.value === VOCABULARIES.SCHEMA.Person
+        q.object.value === VOCABULARIES.SCHEMA.Person,
     );
     expect(schemaPersonQuad).toBeDefined();
 
     const foafPersonQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.RDF.type &&
-        q.object.value === VOCABULARIES.FOAF.Person
+        q.object.value === VOCABULARIES.FOAF.Person,
     );
     expect(foafPersonQuad).toBeDefined();
   });
@@ -56,7 +56,7 @@ describe("PoetConverter", () => {
     const nameQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.FOAF.name &&
-        q.object.value === mockPoet.name
+        q.object.value === mockPoet.name,
     );
 
     expect(nameQuad).toBeDefined();
@@ -71,7 +71,7 @@ describe("PoetConverter", () => {
     const nameKanaQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.nameKana &&
-        q.object.value === mockPoet.name_kana
+        q.object.value === mockPoet.name_kana,
     );
 
     expect(nameKanaQuad).toBeDefined();
@@ -86,7 +86,7 @@ describe("PoetConverter", () => {
     const biographyQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.SCHEMA.description &&
-        q.object.value === mockPoet.biography
+        q.object.value === mockPoet.biography,
     );
 
     expect(biographyQuad).toBeDefined();
@@ -101,21 +101,25 @@ describe("PoetConverter", () => {
     const birthYearQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.birthYear &&
-        q.object.value === String(mockPoet.birth_year)
+        q.object.value === String(mockPoet.birth_year),
     );
     expect(birthYearQuad).toBeDefined();
     if ("datatype" in birthYearQuad!.object) {
-      expect(birthYearQuad!.object.datatype.value).toBe(VOCABULARIES.XSD.integer);
+      expect(birthYearQuad!.object.datatype.value).toBe(
+        VOCABULARIES.XSD.integer,
+      );
     }
 
     const deathYearQuad = quads.find(
       (q) =>
         q.predicate.value === HAIKU_MONUMENT_VOCAB.deathYear &&
-        q.object.value === String(mockPoet.death_year)
+        q.object.value === String(mockPoet.death_year),
     );
     expect(deathYearQuad).toBeDefined();
     if ("datatype" in deathYearQuad!.object) {
-      expect(deathYearQuad!.object.datatype.value).toBe(VOCABULARIES.XSD.integer);
+      expect(deathYearQuad!.object.datatype.value).toBe(
+        VOCABULARIES.XSD.integer,
+      );
     }
   });
 
@@ -125,7 +129,7 @@ describe("PoetConverter", () => {
     const homepageQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.FOAF.homepage &&
-        q.object.value === mockPoet.link_url
+        q.object.value === mockPoet.link_url,
     );
 
     expect(homepageQuad).toBeDefined();
@@ -137,7 +141,7 @@ describe("PoetConverter", () => {
     const depictionQuad = quads.find(
       (q) =>
         q.predicate.value === VOCABULARIES.FOAF.depiction &&
-        q.object.value === mockPoet.image_url
+        q.object.value === mockPoet.image_url,
     );
 
     expect(depictionQuad).toBeDefined();
@@ -160,12 +164,12 @@ describe("PoetConverter", () => {
     const quads = convertPoetToRDF(poetWithoutOptionals);
 
     const nameKanaQuad = quads.find(
-      (q) => q.predicate.value === HAIKU_MONUMENT_VOCAB.nameKana
+      (q) => q.predicate.value === HAIKU_MONUMENT_VOCAB.nameKana,
     );
     expect(nameKanaQuad).toBeUndefined();
 
     const biographyQuad = quads.find(
-      (q) => q.predicate.value === VOCABULARIES.SCHEMA.description
+      (q) => q.predicate.value === VOCABULARIES.SCHEMA.description,
     );
     expect(biographyQuad).toBeUndefined();
   });

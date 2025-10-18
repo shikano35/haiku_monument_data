@@ -4,9 +4,9 @@ import {
   VOCABULARIES,
 } from "@/domain/vocabularies";
 import type { MonumentDetail } from "@/types/api";
+import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 import type { Quad } from "@rdfjs/types";
 import { DataFactory } from "n3";
-import { formatToISO8601 } from "@/utils/dateTimeFormatter";
 
 const { namedNode, literal, quad, blankNode } = DataFactory;
 
@@ -71,7 +71,7 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
         namedNode(monument.monument_type_uri),
       ),
     );
-    
+
     // Getty AAT URIの場合は、明示的にAAT語彙として参照
     if (monument.monument_type_uri.startsWith("http://vocab.getty.edu/aat/")) {
       quads.push(
@@ -219,14 +219,8 @@ export function convertMonumentToRDF(monument: MonumentDetail): Quad[] {
 
         // schema:GeoCoordinates パターン
         const geoNode = blankNode(`geo_${monument.id}`);
-        
-        quads.push(
-          quad(
-            subject,
-            namedNode(VOCABULARIES.SCHEMA.geo),
-            geoNode,
-          ),
-        );
+
+        quads.push(quad(subject, namedNode(VOCABULARIES.SCHEMA.geo), geoNode));
         quads.push(
           quad(
             geoNode,
